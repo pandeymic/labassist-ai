@@ -1,0 +1,32 @@
+[
+  {
+    "faq_id": "FAQ001",
+    "question": "Do you offer home blood sample collection?",
+    "aliases": ["home collection", "sample pickup", "come to my house", "home sample"],
+    "answer": "Yes! We provide complimentary home blood and urine sample collection across New Delhi and NCR. Our certified phlebotomists arrive at your booked time slot between 6:00 AM and 8:00 PM."
+  },
+  {
+    "faq_id": "FAQ002",
+    "question": "How soon will I get my laboratory reports?",
+    "aliases": ["report timing", "when will I get results", "turnaround time", "report delivery"],
+    "answer": "Most routine tests (like CBC, FBS, and Urine Routine) are delivered via WhatsApp and email within 4 to 6 hours. Comprehensive packages or specialized vitamin tests take 12 to 24 hours."
+  },
+  {
+    "faq_id": "FAQ003",
+    "question": "What does fasting mean before a blood test?",
+    "aliases": ["fasting instructions", "can I drink water", "what is fasting", "eat before test"],
+    "answer": "Fasting means strictly no food, tea, coffee, or milk for the specified duration (usually 8-10 hours). You may drink plain water. We recommend scheduling fasting tests early in the morning."
+  },
+  {
+    "faq_id": "FAQ004",
+    "question": "What payment methods are accepted?",
+    "aliases": ["how to pay", "UPI payment", "cash on collection", "card payment"],
+    "answer": "You can pay via UPI (GPay, PhonePe, Paytm), credit/debit card, or cash directly to the phlebotomist at the time of sample collection, or pay online via payment link."
+  },
+  {
+    "faq_id": "FAQ005",
+    "question": "How can I reschedule or cancel my appointment?",
+    "aliases": ["cancel booking", "reschedule appointment", "change date or time"],
+    "answer": "You can reschedule or cancel your appointment anytime up to 1 hour before the scheduled sample collection slot at no cost by asking LabAssist or calling our helpdesk at +91-8299597072."
+  }
+]

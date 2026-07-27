@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  labassist-backend:
+    build: .
+    container_name: labassist-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      - ./chroma_db:/app/chroma_db
+    restart: always
