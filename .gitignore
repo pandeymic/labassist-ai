@@ -1,0 +1,16 @@
+.venv/
+backend/.venv/
+__pycache__/
+*.py[cod]
+data/labassist.db
+
+# Local operating-system and environment files
+.DS_Store
+.env
+.env.save
+.env.*
+!.env.example
+
+# Generated local data; rebuild from the catalog at runtime
+chroma_db/
+data/*.db

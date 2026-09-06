@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Explicitly allow AI Search Engines & LLM Answer Engines (AEO / SEA AI)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: https://labassist-ai.up.railway.app/sitemap.xml
+AI-Knowledge: https://labassist-ai.up.railway.app/llms.txt

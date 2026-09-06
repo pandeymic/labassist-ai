@@ -1,5 +1,15 @@
 import json
+import re
 from typing import Dict, Any
+
+
+_GREETING_PATTERN = re.compile(r"^(hi|hello|hey|hola|namaste|good (morning|afternoon|evening))\W*$", re.IGNORECASE)
+_ABUSIVE_TERMS = {"fuck", "fucking", "shit", "bitch", "asshole", "madarchod", "bhenchod"}
+
+
+def is_abusive_message(message: str) -> bool:
+    words = set(re.findall(r"[a-z]+", message.lower()))
+    return bool(words & _ABUSIVE_TERMS)
 
 def classify_intent(user_message: str, client: Any) -> Dict[str, str]:
     """
@@ -12,6 +22,12 @@ def classify_intent(user_message: str, client: Any) -> Dict[str, str]:
 
     Returns a dict: {"intent": "<INTENT_NAME>", "confidence": "high", "reasoning": "..."}
     """
+    normalized = user_message.strip()
+    if _GREETING_PATTERN.fullmatch(normalized):
+        return {"intent": "GENERAL_CHAT", "confidence": "high", "reasoning": "Greeting guard"}
+    if is_abusive_message(normalized):
+        return {"intent": "GENERAL_CHAT", "confidence": "high", "reasoning": "Unsafe language guard"}
+
     system_prompt = (
         "You are an AI Intent Classifier for a medical diagnostic laboratory named LabAssist. "
         "Analyze the user's message and classify it into EXACTLY ONE of these 5 intents:\n"

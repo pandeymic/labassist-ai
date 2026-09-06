@@ -3,8 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabAssist AI — Clinical Laboratory Front Desk & RAG Portal</title>
+    <title>LabAssist AI 🏥 — Autonomous Diagnostic Laboratory Front Desk & RAG Portal</title>
+
+    <!-- Primary SEO Meta Tags -->
+    <meta name="description" content="LabAssist AI — Autonomous conversational AI front desk for diagnostic laboratories in India. Grounded RAG over 50+ blood & urine tests, zero price hallucination, confirmation-first sample booking, and Hindi/Bengali localization." />
+    <meta name="keywords" content="LabAssist AI, diagnostic lab AI, pathology front desk AI, medical laboratory chatbot, automated test booking AI, ChromaDB medical RAG, Indian laboratory AI software, Lal PathLabs automation, Thyrocare chatbot" />
+    <meta name="author" content="LabAssist AI — Diagnostic Healthcare Edition" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://labassist-ai.up.railway.app/" />
+
+    <!-- OpenGraph (OG) Meta Tags for Social Sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="LabAssist AI 🏥 — Autonomous Diagnostic Laboratory Front Desk" />
+    <meta property="og:description" content="Automate 100% of diagnostic laboratory front-desk chat, test catalog inquiries, and sample collection bookings with zero medical hallucination." />
+    <meta property="og:url" content="https://labassist-ai.up.railway.app/" />
+    <meta property="og:site_name" content="LabAssist AI" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LabAssist AI 🏥 — Diagnostic Lab AI Front Desk" />
+    <meta name="twitter:description" content="Automate pathology front-desk chat, RAG test catalogs, and home sample bookings with zero hallucination." />
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- SEA AI / AEO JSON-LD Schemas -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "LabAssist AI",
+      "url": "https://labassist-ai.up.railway.app/",
+      "description": "Autonomous conversational AI front desk for diagnostic laboratories featuring grounded RAG over blood/urine catalogs, zero price hallucination, confirmation-first booking, and Indian regional language support.",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "2999.00",
+        "priceCurrency": "INR",
+        "description": "B2B Pro Lab Monthly Subscription"
+      },
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Diagnostic Laboratories, Pathologists, Medical Centers in India"
+      }
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is LabAssist AI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LabAssist AI is an autonomous diagnostic laboratory front desk that automates patient inquiries, pricing checks, fasting instructions, and home sample collection bookings for pathology centers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does LabAssist AI prevent medical price and preparation hallucination?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LabAssist AI uses a semantic RAG pipeline powered by ChromaDB to retrieve exact test pricing, turnaround times, and fasting rules from verified laboratory catalogs, eliminating LLM guesswork."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does LabAssist AI support Hindi and regional Indian languages?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. LabAssist AI is localized for the Indian healthcare market and seamlessly supports patient conversations in English, Hindi (हिन्दी), and Bengali (বাংলা)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much does LabAssist AI cost for diagnostic laboratories in India?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "LabAssist AI is currently available as a pilot for diagnostic laboratories. Contact the team for pilot pricing and onboarding."
+          }
+        }
+      ]
+    }
+    </script>
     <style>
         :root {
             --bg-page: #f8fafc;
@@ -332,6 +416,271 @@
             background-color: var(--border-default);
             border-color: var(--border-strong);
         }
+
+        .slot-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-width: 680px;
+            padding: 0 0 12px;
+        }
+
+        .slot-picker-label {
+            width: 100%;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .slot-button {
+            border: 1px solid #7dd3fc;
+            border-radius: 6px;
+            color: var(--brand-hover);
+            background: #f0f9ff;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 12px;
+        }
+
+        .slot-button:hover { background: #e0f2fe; }
+
+        .admin-link {
+            color: var(--brand-hover);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .booking-card {
+            border: 1px solid #0284c7;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+            max-width: 480px;
+            margin: 8px 0 16px;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .booking-card-header {
+            background: #f0f9ff;
+            border-bottom: 1px solid #e0f2fe;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            color: #0369a1;
+        }
+
+        .booking-card-body {
+            padding: 12px 14px;
+            display: grid;
+            gap: 6px;
+            color: var(--text-main);
+        }
+
+        .booking-card-footer {
+            background: #f8fafc;
+            border-top: 1px solid #f1f5f9;
+            padding: 8px 14px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .booking-card-btn {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            border-radius: 5px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .booking-card-btn.cancel {
+            color: #b91c1c;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        /* Patient-facing Sara widget: this is the embeddable product surface. */
+        .sara-launcher {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 20;
+            border: 0;
+            border-radius: 999px;
+            background: var(--brand-primary);
+            color: #fff;
+            padding: 13px 18px 13px 14px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            box-shadow: 0 12px 28px rgba(2, 132, 199, .28);
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+        }
+
+        .sara-launcher:hover { background: var(--brand-hover); }
+
+        .sara-avatar {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 14px;
+        }
+
+        .sara-widget {
+            position: fixed;
+            right: 24px;
+            bottom: 86px;
+            z-index: 19;
+            width: min(390px, calc(100vw - 32px));
+            height: min(620px, calc(100vh - 120px));
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-default);
+            border-radius: 16px;
+            background: var(--bg-surface);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, .20);
+        }
+
+        .sara-widget.open { display: flex; }
+
+        .sara-widget-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            background: linear-gradient(135deg, #0369a1, #0284c7);
+        }
+
+        .sara-widget-header strong { display: block; font-size: 14px; }
+        .sara-widget-header small { display: block; opacity: .86; margin-top: 2px; }
+
+        .sara-header-controls { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+        .sara-language {
+            border: 1px solid rgba(255,255,255,.45);
+            border-radius: 7px;
+            padding: 5px 6px;
+            color: #fff;
+            background: rgba(255,255,255,.14);
+            font: inherit;
+            font-size: 11px;
+        }
+
+        .sara-close {
+            border: 0;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .sara-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #f8fafc;
+        }
+
+        .sara-message {
+            max-width: 86%;
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+        }
+
+        .sara-message.ai { align-self: flex-start; background: #fff; border: 1px solid var(--border-default); }
+        .sara-message.user { align-self: flex-end; background: var(--brand-primary); color: #fff; }
+
+        .sara-quick-actions { display: flex; gap: 6px; overflow-x: auto; padding: 8px 10px 0; background: #f8fafc; }
+        .sara-quick-action, .sara-slot {
+            flex: 0 0 auto;
+            border: 1px solid #bae6fd;
+            border-radius: 999px;
+            padding: 6px 9px;
+            color: #0369a1;
+            background: #f0f9ff;
+            cursor: pointer;
+            font: inherit;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .sara-quick-action:hover, .sara-slot:hover { background: #e0f2fe; }
+        .sara-slot-picker { display: flex; flex-wrap: wrap; gap: 6px; align-self: flex-start; max-width: 88%; }
+        .sara-slot-label { width: 100%; color: var(--text-muted); font-size: 11px; }
+        .sara-booking-card { align-self: flex-start; max-width: 90%; border: 1px solid #7dd3fc; border-radius: 10px; background: #fff; padding: 10px; font-size: 12px; line-height: 1.5; }
+        .sara-booking-card strong { color: #0369a1; }
+
+        .sara-status {
+            min-height: 18px;
+            padding: 0 14px 7px;
+            color: var(--text-muted);
+            background: #fff;
+            font-size: 11px;
+        }
+
+        .sara-input-row {
+            display: flex;
+            gap: 7px;
+            padding: 10px;
+            border-top: 1px solid var(--border-default);
+            background: #fff;
+        }
+
+        .sara-input {
+            min-width: 0;
+            flex: 1;
+            border: 1px solid var(--border-strong);
+            border-radius: 9px;
+            padding: 10px;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .sara-input:focus { border-color: var(--brand-primary); }
+
+        .sara-icon-btn {
+            width: 40px;
+            border: 1px solid var(--border-strong);
+            border-radius: 9px;
+            background: #fff;
+            color: var(--brand-hover);
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        .sara-icon-btn:hover, .sara-icon-btn.listening { background: #e0f2fe; border-color: #7dd3fc; }
+        .sara-icon-btn.live { background: #dcfce7; border-color: #86efac; color: #15803d; }
+        .sara-send { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); font-size: 13px; }
+
+        @media (max-width: 700px) {
+            .workspace { grid-template-columns: 1fr; height: auto; min-height: calc(100vh - 64px); }
+            .catalog-panel { display: none; }
+            .top-navbar { padding: 0 16px; }
+            .system-status { display: none; }
+            .sara-launcher { right: 16px; bottom: 16px; }
+            .sara-widget { right: 16px; bottom: 78px; }
+        }
     </style>
 </head>
 <body>
@@ -349,6 +698,7 @@
             <span class="status-dot"></span>
             <span>ChromaDB Vector Store Connected</span>
         </div>
+        <a class="admin-link" href="/admin">Staff dashboard →</a>
     </header>
 
     <!-- Main Workspace -->
@@ -408,6 +758,39 @@
         </main>
     </div>
 
+    <button class="sara-launcher" id="saraLauncher" type="button" aria-expanded="false" aria-controls="saraWidget">
+        <span class="sara-avatar">✦</span>
+        <span>Talk to Sara</span>
+    </button>
+
+    <section class="sara-widget" id="saraWidget" aria-label="LabAssist Sara assistant">
+        <header class="sara-widget-header">
+            <span class="sara-avatar">✦</span>
+            <div><strong>Sara · LabAssist receptionist</strong><small>Ask about tests or book home collection</small></div>
+            <div class="sara-header-controls">
+                <select class="sara-language" id="saraLanguage" aria-label="Assistant language">
+                    <option value="English">English</option>
+                    <option value="Hindi">हिन्दी</option>
+                </select>
+                <button class="sara-close" id="saraClose" type="button" aria-label="Close assistant">×</button>
+            </div>
+        </header>
+        <div class="sara-quick-actions" aria-label="Quick actions">
+            <button class="sara-quick-action" type="button" data-sara-prompt="What is the price and fasting requirement for a Lipid Profile?">Test price</button>
+            <button class="sara-quick-action" type="button" data-sara-prompt="I want to book a CBC test for home collection.">Book a test</button>
+            <button class="sara-quick-action" type="button" data-sara-prompt="Do you offer home sample pickup?">Home collection</button>
+        </div>
+        <div class="sara-messages" id="saraMessages">
+            <div class="sara-message ai">Hi, I’m Sara. You can type or tap the microphone to ask about tests, prices, fasting, or appointments.</div>
+        </div>
+        <div class="sara-status" id="saraStatus" aria-live="polite"></div>
+        <div class="sara-input-row">
+            <input class="sara-input" id="saraInput" type="text" placeholder="Ask Sara anything..." autocomplete="off">
+            <button class="sara-icon-btn" id="saraMic" type="button" aria-label="Use microphone">🎙️</button>
+            <button class="sara-icon-btn sara-send" id="saraSend" type="button" aria-label="Send message">➤</button>
+        </div>
+    </section>
+
     <script>
         const sessionId = "session-" + Math.random().toString(36).substring(2, 10);
 
@@ -437,9 +820,11 @@
             const div = document.createElement("div");
             div.className = "message " + (isUser ? "message-user" : "message-ai");
             
-            // Format text with clean line breaks
-            let formattedText = text.replace(/\n/g, '<br>');
-            div.innerHTML = formattedText;
+            // Avoid rendering arbitrary patient text as HTML.
+            text.split('\n').forEach((line, index) => {
+                if (index) div.appendChild(document.createElement('br'));
+                div.appendChild(document.createTextNode(line));
+            });
 
             if (!isUser && intent) {
                 const pill = document.createElement("div");
@@ -448,6 +833,55 @@
                 div.appendChild(pill);
             }
 
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendAvailableSlots(slots) {
+            if (!slots || !slots.length) return;
+            const container = document.getElementById("chatMessages");
+            const picker = document.createElement("div");
+            picker.className = "slot-picker";
+            const label = document.createElement("div");
+            label.className = "slot-picker-label";
+            label.textContent = "Available collection slots";
+            picker.appendChild(label);
+
+            slots.forEach(slot => {
+                const button = document.createElement("button");
+                button.className = "slot-button";
+                button.textContent = `${slot.start_time}–${slot.end_time}`;
+                button.onclick = () => sendQuickMessage(slot.start_time);
+                picker.appendChild(button);
+            });
+            container.appendChild(picker);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendBookingCard(card) {
+            if (!card) return;
+            const container = document.getElementById("chatMessages");
+            const div = document.createElement("div");
+            div.className = "booking-card";
+            const safe = value => String(value ?? '').replace(/[&<>\"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char]));
+            div.innerHTML = `
+                <div class="booking-card-header">
+                    <span>🏥 CONFIRMED HOME COLLECTION</span>
+                    <span>${safe(card.id || 'CONFIRMED')}</span>
+                </div>
+                <div class="booking-card-body">
+                    <div><strong>Patient:</strong> ${safe(card.patient_name || 'Patient')} (${safe(card.phone_number || '')})</div>
+                    <div><strong>Test:</strong> ${safe(card.test_name || 'Diagnostic Test')}</div>
+                    <div><strong>Schedule:</strong> ${safe(card.preferred_date || '')} at ${safe(card.preferred_time || '')}</div>
+                    <div><strong>Address:</strong> ${safe(card.collection_address || 'Lab visit')}</div>
+                </div>
+                <div class="booking-card-footer">
+                    <button class="booking-card-btn cancel" onclick="sendQuickMessage('cancel ${safe(card.id)}')">Cancel Appointment</button>
+                    <button class="booking-card-btn" onclick="sendQuickMessage('status ${safe(card.id)}')">Check Status</button>
+                </div>
+            `;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
@@ -472,6 +906,8 @@
                 });
                 const data = await res.json();
                 appendMessage(data.reply, false, data.intent);
+                appendAvailableSlots(data.available_slots);
+                appendBookingCard(data.booking_card);
             } catch (err) {
                 appendMessage("Error communicating with server. Please verify FastAPI service is active.", false, "ERROR");
             }
@@ -485,6 +921,300 @@
         function handleKeyPress(e) {
             if (e.key === "Enter") sendMessage();
         }
+
+        // Sara widget: text and browser speech use the same LabAssist API/session.
+        const saraSessionId = "sara-" + Math.random().toString(36).substring(2, 10);
+        const saraLauncher = document.getElementById("saraLauncher");
+        const saraWidget = document.getElementById("saraWidget");
+        const saraClose = document.getElementById("saraClose");
+        const saraInput = document.getElementById("saraInput");
+        const saraMic = document.getElementById("saraMic");
+        const saraSend = document.getElementById("saraSend");
+        const saraMessages = document.getElementById("saraMessages");
+        const saraStatus = document.getElementById("saraStatus");
+        const saraLanguage = document.getElementById("saraLanguage");
+        let saraRecognition = null;
+        let saraLive = {
+            session: null,
+            stream: null,
+            inputContext: null,
+            outputContext: null,
+            processor: null,
+            source: null,
+            nextOutputTime: 0,
+            activeSources: new Set()
+        };
+
+        function toggleSara(open) {
+            saraWidget.classList.toggle("open", open);
+            saraLauncher.setAttribute("aria-expanded", String(open));
+            if (open) saraInput.focus();
+        }
+
+        function appendSaraMessage(text, isUser) {
+            const message = document.createElement("div");
+            message.className = "sara-message " + (isUser ? "user" : "ai");
+            message.textContent = text;
+            saraMessages.appendChild(message);
+            saraMessages.scrollTop = saraMessages.scrollHeight;
+        }
+
+        function escapeSaraHtml(value) {
+            return String(value ?? "").replace(/[&<>\"']/g, char => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+            }[char]));
+        }
+
+        function appendSaraSlots(slots) {
+            if (!Array.isArray(slots) || !slots.length) return;
+            const picker = document.createElement("div");
+            picker.className = "sara-slot-picker";
+            const label = document.createElement("div");
+            label.className = "sara-slot-label";
+            label.textContent = "Available collection slots";
+            picker.appendChild(label);
+            slots.forEach(slot => {
+                const button = document.createElement("button");
+                button.className = "sara-slot";
+                button.type = "button";
+                button.textContent = `${slot.start_time}–${slot.end_time}`;
+                button.onclick = () => {
+                    saraInput.value = slot.start_time;
+                    sendSaraMessage();
+                };
+                picker.appendChild(button);
+            });
+            saraMessages.appendChild(picker);
+            saraMessages.scrollTop = saraMessages.scrollHeight;
+        }
+
+        function appendSaraBookingCard(card) {
+            if (!card) return;
+            const el = document.createElement("div");
+            el.className = "sara-booking-card";
+            el.innerHTML = "<strong>Booking confirmed</strong><br>" +
+                `ID: ${escapeSaraHtml(card.id || "CONFIRMED")}<br>` +
+                `Test: ${escapeSaraHtml(card.test_name || "Diagnostic test")}<br>` +
+                `When: ${escapeSaraHtml(card.preferred_date || "")} at ${escapeSaraHtml(card.preferred_time || "")}<br>` +
+                `Patient: ${escapeSaraHtml(card.patient_name || "")} (${escapeSaraHtml(card.phone_number || "")})`;
+            saraMessages.appendChild(el);
+            saraMessages.scrollTop = saraMessages.scrollHeight;
+        }
+
+        function speakSara(text) {
+            if (!window.speechSynthesis || !text) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = saraLanguage.value === "Hindi" ? "hi-IN" : "en-IN";
+            utterance.rate = 0.98;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function bytesToBase64(bytes) {
+            let binary = "";
+            const chunkSize = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+            }
+            return btoa(binary);
+        }
+
+        function floatToPcm16Base64(input) {
+            const buffer = new ArrayBuffer(input.length * 2);
+            const view = new DataView(buffer);
+            for (let i = 0; i < input.length; i++) {
+                const sample = Math.max(-1, Math.min(1, input[i]));
+                view.setInt16(i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+            }
+            return bytesToBase64(new Uint8Array(buffer));
+        }
+
+        function pcm16ToAudioBuffer(base64, context, sampleRate) {
+            const raw = atob(base64);
+            const bytes = new Uint8Array(raw.length);
+            for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+            const pcm = new Int16Array(bytes.buffer, bytes.byteOffset, Math.floor(bytes.byteLength / 2));
+            const audio = context.createBuffer(1, pcm.length, sampleRate);
+            const channel = audio.getChannelData(0);
+            for (let i = 0; i < pcm.length; i++) channel[i] = pcm[i] / 32768;
+            return audio;
+        }
+
+        async function stopGeminiLive() {
+            const live = saraLive;
+            try { if (live.processor) live.processor.disconnect(); } catch (_) {}
+            try { if (live.source) live.source.disconnect(); } catch (_) {}
+            try { if (live.stream) live.stream.getTracks().forEach(track => track.stop()); } catch (_) {}
+            try { if (live.session) live.session.close(); } catch (_) {}
+            try { if (live.inputContext) await live.inputContext.close(); } catch (_) {}
+            try { if (live.outputContext) await live.outputContext.close(); } catch (_) {}
+            live.activeSources.forEach(source => { try { source.stop(); } catch (_) {} });
+            saraLive = { session: null, stream: null, inputContext: null, outputContext: null, processor: null, source: null, nextOutputTime: 0, activeSources: new Set() };
+            saraMic.classList.remove("listening", "live");
+        }
+
+        async function startGeminiLive() {
+            if (saraLive.session) {
+                await stopGeminiLive();
+                saraStatus.textContent = "Gemini Live stopped";
+                return;
+            }
+            if (!navigator.mediaDevices?.getUserMedia) {
+                throw new Error("Microphone access is unavailable in this browser");
+            }
+            saraStatus.textContent = "Starting Gemini Live...";
+            const tokenResponse = await fetch("/api/live/token", { method: "POST" });
+            if (!tokenResponse.ok) throw new Error("Gemini Live is not configured on the backend");
+            const tokenData = await tokenResponse.json();
+            const sdk = await import("https://cdn.jsdelivr.net/npm/@google/genai@1.34.0/+esm");
+            const ai = new sdk.GoogleGenAI({ apiKey: tokenData.token, httpOptions: { apiVersion: "v1alpha" } });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const inputContext = new AudioContext({ sampleRate: 16000 });
+            const outputContext = new AudioContext({ sampleRate: 24000 });
+            const session = await ai.live.connect({
+                model: tokenData.model,
+                config: {
+                    responseModalities: ["AUDIO"],
+                    inputAudioTranscription: {},
+                    outputAudioTranscription: {},
+                    systemInstruction: `You are Sara, a safe and concise diagnostic laboratory receptionist. Speak in ${saraLanguage.value}. Answer test information, prices, fasting, timings, home collection, and appointment questions. Never diagnose, interpret medical reports, prescribe, or give treatment advice. For booking, ask the patient to continue in the text chat so the LabAssist booking workflow can validate the slot and require confirmation.`
+                },
+                callbacks: {
+                    onopen: () => {
+                        saraStatus.textContent = "Gemini Live is listening";
+                        saraMic.classList.add("listening", "live");
+                    },
+                    onmessage: message => {
+                        const serverContent = message?.serverContent;
+                        const parts = serverContent?.modelTurn?.parts || [];
+                        const audioPart = parts.find(part => part?.inlineData?.data);
+                        if (audioPart && outputContext.state !== "closed") {
+                            try {
+                                const buffer = pcm16ToAudioBuffer(audioPart.inlineData.data, outputContext, 24000);
+                                const source = outputContext.createBufferSource();
+                                source.buffer = buffer;
+                                source.connect(outputContext.destination);
+                                const now = outputContext.currentTime;
+                                const when = Math.max(saraLive.nextOutputTime, now);
+                                source.start(when);
+                                saraLive.nextOutputTime = when + buffer.duration;
+                                saraLive.activeSources.add(source);
+                                source.onended = () => saraLive.activeSources.delete(source);
+                            } catch (error) { console.warn("Gemini audio playback failed", error); }
+                        }
+                        if (serverContent?.inputTranscription?.text) saraStatus.textContent = "I heard you...";
+                        if (serverContent?.outputTranscription?.text) saraStatus.textContent = "Sara is speaking...";
+                        if (serverContent?.turnComplete) saraStatus.textContent = "Gemini Live is listening";
+                        if (serverContent?.interrupted) saraLive.activeSources.forEach(source => { try { source.stop(); } catch (_) {} });
+                    },
+                    onerror: error => { console.error("Gemini Live error", error); saraStatus.textContent = "Gemini Live connection error"; },
+                    onclose: () => { saraStatus.textContent = "Gemini Live ended"; }
+                }
+            });
+            saraLive = { ...saraLive, session, stream, inputContext, outputContext };
+            const source = inputContext.createMediaStreamSource(stream);
+            const processor = inputContext.createScriptProcessor(4096, 1, 1);
+            processor.onaudioprocess = event => {
+                if (!saraLive.session) return;
+                try {
+                    saraLive.session.sendRealtimeInput({ audio: { data: floatToPcm16Base64(event.inputBuffer.getChannelData(0)), mimeType: "audio/pcm;rate=16000" } });
+                } catch (_) {}
+            };
+            source.connect(processor);
+            processor.connect(inputContext.destination);
+            saraLive.source = source;
+            saraLive.processor = processor;
+        }
+
+        async function sendSaraMessage() {
+            const text = saraInput.value.trim();
+            if (!text) return;
+            saraInput.value = "";
+            appendSaraMessage(text, true);
+            saraStatus.textContent = "Sara is thinking...";
+            saraSend.disabled = true;
+
+            try {
+                const res = await fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        session_id: saraSessionId,
+                        message: text,
+                        language: saraLanguage.value,
+                        source: "web_voice_widget"
+                    })
+                });
+                if (!res.ok) throw new Error("Assistant request failed");
+                const data = await res.json();
+                appendSaraMessage(data.reply || "I’m sorry, I could not process that request.", false);
+                appendSaraSlots(data.available_slots);
+                appendSaraBookingCard(data.booking_card);
+                speakSara(data.reply);
+                saraStatus.textContent = data.intent === "BOOK_APPOINTMENT" ? "Booking assistant active" : "Ready to help";
+            } catch (err) {
+                appendSaraMessage("I’m having trouble connecting right now. Please try again or contact the lab directly.", false);
+                saraStatus.textContent = "Connection problem";
+            } finally {
+                saraSend.disabled = false;
+                saraInput.focus();
+            }
+        }
+
+        function startSaraVoice() {
+            startGeminiLive().catch(error => {
+                console.warn("Gemini Live unavailable; using browser speech fallback", error);
+                saraStatus.textContent = "Using browser voice fallback";
+                startBrowserSpeechFallback();
+            });
+        }
+
+        function startBrowserSpeechFallback() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                saraStatus.textContent = "Voice input is not supported in this browser. You can type instead.";
+                return;
+            }
+            if (saraRecognition) {
+                saraRecognition.stop();
+                return;
+            }
+
+            saraRecognition = new SpeechRecognition();
+            saraRecognition.lang = saraLanguage.value === "Hindi" ? "hi-IN" : "en-IN";
+            saraRecognition.interimResults = false;
+            saraRecognition.maxAlternatives = 1;
+            saraRecognition.onstart = () => {
+                saraMic.classList.add("listening");
+                saraStatus.textContent = "Listening...";
+            };
+            saraRecognition.onresult = event => {
+                saraInput.value = event.results[0][0].transcript;
+                sendSaraMessage();
+            };
+            saraRecognition.onerror = event => {
+                saraStatus.textContent = event.error === "not-allowed" ? "Microphone permission was blocked." : "I could not hear that. Please try again.";
+            };
+            saraRecognition.onend = () => {
+                saraMic.classList.remove("listening");
+                saraRecognition = null;
+            };
+            saraRecognition.start();
+        }
+
+        saraLauncher.addEventListener("click", () => toggleSara(!saraWidget.classList.contains("open")));
+        saraClose.addEventListener("click", () => toggleSara(false));
+        saraMic.addEventListener("click", startSaraVoice);
+        saraSend.addEventListener("click", sendSaraMessage);
+        document.querySelectorAll("[data-sara-prompt]").forEach(button => {
+            button.addEventListener("click", () => {
+                saraInput.value = button.dataset.saraPrompt;
+                sendSaraMessage();
+            });
+        });
+        saraInput.addEventListener("keydown", event => {
+            if (event.key === "Enter") sendSaraMessage();
+        });
 
         window.onload = loadCatalog;
     </script>

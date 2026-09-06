@@ -1,6 +1,6 @@
 # 🏥 LabAssist AI — Autonomous Diagnostic Laboratory Front Desk
 
-> **Production-grade conversational AI assistant for diagnostic laboratories** featuring semantic RAG over medical test catalogs, multi-turn appointment booking state machines, and multilingual support.
+> A pilot-ready conversational AI assistant for diagnostic laboratories featuring grounded test information, a persistent confirmation-first booking workflow, and multilingual response support.
 
 ---
 
@@ -38,7 +38,11 @@ graph TD
    - Built to handle English, Hindi, and Bengali queries for diverse urban medical center demographics.
 
 4. **Containerized Production Setup**
-   - Fully dockerized with persistent ChromaDB volume mounts and clean REST API boundaries.
+    - Fully dockerized with persistent ChromaDB volume mounts and clean REST API boundaries.
+
+5. **Persistent appointment operations**
+   - SQLite-backed lab profile, slot capacity, booking sessions, confirmed appointments, and staff cancellation APIs.
+   - A booking is only created after the patient explicitly replies with a confirmation.
 
 ---
 
@@ -69,6 +73,8 @@ pip install -r requirements.txt
 Add your Groq API key to `~/.env` or export it:
 ```bash
 export GROQ_API_KEY="gsk_your_api_key_here"
+export LABASSIST_ADMIN_KEY="choose-a-long-random-value"
+export PUBLIC_BASE_URL="https://your-public-domain.example.com"
 ```
 
 ### 3. Start the FastAPI Server
@@ -92,6 +98,41 @@ open frontend/index.html
 | `GET` | `/api/health` | Service health and LLM connection verification |
 | `GET` | `/api/tests` | Returns JSON catalog of all available laboratory tests |
 | `POST` | `/api/chat` | Main conversational endpoint with RAG + Intent Routing |
+| `GET` | `/api/lab/profile` | Public lab identity for the web widget |
+| `GET` | `/api/slots?appointment_date=YYYY-MM-DD` | Available booking slots |
+| `POST` | `/api/admin/slots` | Create a slot; requires `X-Admin-Key` |
+| `GET` | `/api/admin/appointments` | List appointments; requires `X-Admin-Key` |
+| `POST` | `/api/admin/appointments/{id}/cancel` | Cancel appointment; requires `X-Admin-Key` |
+| `POST` | `/api/webhook/voice` | Twilio-compatible voice call entrypoint |
+| `POST` | `/api/webhook/voice/respond` | Twilio speech transcript → shared LabAssist workflow |
+| `POST` | `/api/live/token` | Short-lived Gemini Live browser-session token |
+
+### Phone voice pilot
+
+The voice endpoints use Twilio's speech gathering only as the telephony adapter. LabAssist still owns the intent routing, RAG answers, slot validation, confirmation, and booking. Set `PUBLIC_BASE_URL` to the public HTTPS URL of the deployment, then configure the Twilio number's incoming voice webhook as:
+
+```text
+POST https://your-public-domain.example.com/api/webhook/voice
+```
+
+This is the first phone slice. Before a paid pilot, add Twilio signature validation, call recording/transcript retention controls, a human-transfer number, and a production voice provider configuration.
+
+### Gemini Live voice widget
+
+Set `GEMINI_API_KEY` only on the backend. The browser requests a single-use, short-lived token from `/api/live/token`; the long-lived API key is never sent to the browser. Gemini Live is currently a preview API, so keep the browser speech fallback enabled.
+
+### Pilot setup
+
+Before accepting a booking, create the real slots that a lab is willing to serve:
+
+```bash
+curl -X POST http://localhost:8000/api/admin/slots \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Key: $LABASSIST_ADMIN_KEY" \
+  -d '{"appointment_date":"2026-08-01","start_time":"08:00","end_time":"09:00","capacity":3}'
+```
+
+Set `ALLOWED_ORIGINS` to the explicit domains allowed to host the web widget. Do not use a wildcard origin for a patient-facing deployment.
 
 ### Sample `/api/chat` Request
 ```json

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LabAssist AI — Staff Dashboard</title>
+  <style>
+    :root { --blue:#0284c7; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --bg:#f8fafc; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:14px Inter,system-ui,sans-serif; }
+    header { align-items:center; background:#fff; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; padding:18px max(24px,calc((100vw - 1160px)/2)); }
+    h1 { font-size:18px; margin:0; } h2 { font-size:15px; margin:0 0 16px; }
+    a { color:var(--blue); font-weight:600; text-decoration:none; }
+    main { margin:28px auto; max-width:1160px; padding:0 24px; }
+    .login, .panel, .metric { background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 1px 2px #0f172a0d; }
+    .login { display:flex; gap:10px; margin-bottom:18px; padding:16px; }
+    input { border:1px solid #cbd5e1; border-radius:6px; font:inherit; min-height:38px; padding:8px 10px; }
+    button { background:var(--blue); border:0; border-radius:6px; color:#fff; cursor:pointer; font:inherit; font-weight:600; padding:9px 13px; }
+    button.secondary { background:#fff; border:1px solid #cbd5e1; color:#334155; }
+    button.danger { background:#b91c1c; }
+    .hidden { display:none; }
+    .metrics { display:grid; gap:14px; grid-template-columns:repeat(3,1fr); margin-bottom:18px; }
+    .metric { padding:18px; } .metric span { color:var(--muted); display:block; font-size:12px; } .metric strong { display:block; font-size:28px; margin-top:6px; }
+    .grid { display:grid; gap:18px; grid-template-columns:330px 1fr; }
+    .panel { padding:20px; } .form { display:grid; gap:10px; }
+    label { color:#475569; display:grid; font-size:12px; font-weight:600; gap:5px; }
+    table { border-collapse:collapse; width:100%; } th,td { border-bottom:1px solid var(--line); padding:11px 8px; text-align:left; vertical-align:top; } th { color:var(--muted); font-size:11px; text-transform:uppercase; }
+    .status { border-radius:999px; display:inline-block; font-size:11px; font-weight:700; padding:4px 7px; text-transform:uppercase; } .confirmed { background:#dcfce7; color:#166534; } .cancelled { background:#fee2e2; color:#991b1b; }
+    #notice { color:#b91c1c; margin:0 0 12px; } @media(max-width:800px) { .grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr} header{padding:16px 24px} }
+  </style>
+</head>
+<body>
+  <header><div><h1>LabAssist AI — Staff Dashboard</h1><small id="labName">Operations console</small></div><a href="/">← Patient chat</a></header>
+  <main>
+    <section id="loginPanel" class="login"><input id="adminKey" type="password" placeholder="Enter staff admin key" autocomplete="current-password"><button onclick="connectDashboard()">Open dashboard</button></section>
+    <p id="notice"></p>
+    <section id="dashboard" class="hidden">
+      <div class="metrics"><div class="metric"><span>Total bookings</span><strong id="totalCount">0</strong></div><div class="metric"><span>Confirmed</span><strong id="confirmedCount">0</strong></div><div class="metric"><span>Cancelled</span><strong id="cancelledCount">0</strong></div></div>
+      <div class="grid">
+        <section class="panel"><h2>Add appointment slot</h2><form class="form" onsubmit="createSlot(event)"><label>Date<input id="slotDate" type="date" required></label><label>Start time<input id="slotStart" type="time" required></label><label>End time<input id="slotEnd" type="time" required></label><label>Capacity<input id="slotCapacity" type="number" min="1" max="100" value="3" required></label><button type="submit">Create slot</button></form></section>
+        <section class="panel"><h2>Appointments</h2><table><thead><tr><th>Patient</th><th>Test</th><th>Collection</th><th>Schedule</th><th>Status</th><th></th></tr></thead><tbody id="appointmentRows"><tr><td colspan="6">Loading appointments…</td></tr></tbody></table></section>
+      </div>
+    </section>
+  </main>
+  <script>
+    const savedKey = sessionStorage.getItem('labassist_admin_key');
+    if (savedKey) { document.getElementById('adminKey').value = savedKey; connectDashboard(); }
+    function headers() { return { 'Content-Type':'application/json', 'X-Admin-Key':sessionStorage.getItem('labassist_admin_key') || '' }; }
+    async function api(url, options={}) { const response = await fetch(url, {...options, headers:{...headers(), ...(options.headers || {})}}); if (!response.ok) throw new Error((await response.json().catch(()=>({detail:'Request failed'}))).detail); return response.json(); }
+    function showError(message='') { document.getElementById('notice').textContent = message; }
+    async function connectDashboard() { sessionStorage.setItem('labassist_admin_key', document.getElementById('adminKey').value); try { await refreshDashboard(); document.getElementById('loginPanel').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); showError(''); } catch (error) { showError(error.message || 'Could not open dashboard.'); } }
+    async function refreshDashboard() { const [dashboard, appointments] = await Promise.all([api('/api/admin/dashboard'), api('/api/admin/appointments')]); document.getElementById('labName').textContent = `${dashboard.profile.name} · ${dashboard.profile.city}`; document.getElementById('totalCount').textContent = dashboard.summary.total; document.getElementById('confirmedCount').textContent = dashboard.summary.confirmed; document.getElementById('cancelledCount').textContent = dashboard.summary.cancelled; renderAppointments(appointments.appointments); }
+    function text(value) { const node=document.createElement('span'); node.textContent=value || '—'; return node.innerHTML; }
+    function renderAppointments(appointments) { const body=document.getElementById('appointmentRows'); if (!appointments.length) { body.innerHTML='<tr><td colspan="6">No appointments yet.</td></tr>'; return; } body.innerHTML=appointments.map(item => `<tr><td><strong>${text(item.patient_name)}</strong><br><small>${text(item.phone_number)}</small></td><td>${text(item.test_name)}</td><td>${text(item.collection_type)}<br><small>${text(item.collection_address)}</small></td><td>${text(item.preferred_date)}<br>${text(item.preferred_time)}</td><td><span class="status ${text(item.status)}">${text(item.status)}</span></td><td>${item.status === 'confirmed' ? `<button class="danger" onclick="cancelAppointment('${item.id}')">Cancel</button>` : ''}</td></tr>`).join(''); }
+    async function createSlot(event) { event.preventDefault(); try { await api('/api/admin/slots', {method:'POST', body:JSON.stringify({appointment_date:slotDate.value, start_time:slotStart.value, end_time:slotEnd.value, capacity:Number(slotCapacity.value)})}); event.target.reset(); slotCapacity.value=3; showError(''); alert('Slot created. It is now available to patients.'); } catch(error) { showError(error.message); } }
+    async function cancelAppointment(id) { if (!confirm('Cancel this appointment?')) return; try { await api(`/api/admin/appointments/${id}/cancel`, {method:'POST'}); await refreshDashboard(); } catch(error) { showError(error.message); } }
+  </script>
+</body>
+</html>

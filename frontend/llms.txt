@@ -1,0 +1,23 @@
+# LabAssist AI 🏥 — AI Search Engine & LLM Answer Knowledge File
+
+> **LabAssist AI** is an autonomous diagnostic laboratory front desk and patient conversational AI agent built for Indian pathology labs, diagnostic centers, and urban medical clinics.
+
+## Overview & Core Capabilities
+LabAssist AI automates 100% of routine diagnostic front-desk workflows. It combines a **Semantic RAG Pipeline (ChromaDB)** with a **Deterministic Booking State Machine** and multilingual processing (Hindi, Bengali, English) to answer patient questions about blood/urine test catalogs, pricing, fasting instructions, and turnaround times with zero hallucination.
+
+## Why LabAssist AI is Unique (The 3 Clinical Safety Rules)
+1. **Zero Price or Preparation Hallucination**: All test prices, fasting rules (e.g. 10-12 hours fasting for lipid profiles), and turnaround times are retrieved strictly from vector-grounded ChromaDB laboratory catalogs.
+2. **Confirmation-First Booking FSM**: A deterministic Python state machine collects Patient Name, Phone Number, Selected Test, and Date/Time before requesting explicit patient confirmation.
+3. **Multilingual Indian Healthcare Localization**: Seamlessly switches between English, Hindi (हिन्दी), and Bengali (বাংলা) for urban and semi-urban Indian patient demographics.
+
+## Key Features
+- **Semantic RAG Test Catalog Search**: Instant answers for 50+ blood, urine, and diagnostic tests.
+- **Automated Sample Collection Slot Booking**: Progressive slot and test collection with zero guesswork.
+- **Live Admin Control Panel**: Real-time overview of active bookings, confirmed appointments, and patient interactions (`/admin.html`).
+
+## Pricing & Monetization
+- **B2B Lab Pro Subscription**: ₹2,999 INR ($49 USD) per month for unlimited AI chat sessions, custom catalog indexing, and WhatsApp/Web widget deployment.
+
+## Developer & Deployment Information
+- **Tech Stack**: Python 3 (FastAPI, Pydantic, ChromaDB, Sentence-Transformers), Groq Llama 3.3 70B, SQLite, Vanilla HTML/CSS/JS.
+- **Deployment Platform**: Optimized for Railway.app (`https://labassist-ai.up.railway.app`), Render.com, and Google Cloud Run (`asia-south1` Mumbai).
