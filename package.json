@@ -1,0 +1,18 @@
+{
+  "name": "labassist-ai",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": ["apps/api", "apps/web"],
+  "scripts": {
+    "dev:operations": "concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "build:operations": "npm run build -w apps/api && npm run build -w apps/web",
+    "test:operations": "npm run test -w apps/api && npm run test -w apps/web",
+    "lint:operations": "npm run lint -w apps/api && npm run lint -w apps/web",
+    "build": "npm run build:operations",
+    "test": "npm run test:operations",
+    "lint": "npm run lint:operations",
+    "db:migrate": "npm run db:migrate -w apps/api",
+    "db:seed": "npm run db:seed -w apps/api"
+  },
+  "devDependencies": { "concurrently": "^9.1.2" }
+}

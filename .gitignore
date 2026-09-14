@@ -1,5 +1,9 @@
 .venv/
 backend/.venv/
+node_modules/
+apps/*/node_modules/
+apps/api/dist/
+apps/web/.next/
 __pycache__/
 *.py[cod]
 data/labassist.db
