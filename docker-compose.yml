@@ -1,13 +1,59 @@
-version: '3.8'
-
 services:
-  labassist-backend:
+  labassist:
     build: .
-    container_name: labassist-backend
-    ports:
-      - "8000:8000"
+    ports: ["8000:8000"]
+    env_file: [.env]
     environment:
-      - GROQ_API_KEY=${GROQ_API_KEY}
+      LABASSIST_DB_PATH: /app/runtime/labassist.db
     volumes:
-      - ./chroma_db:/app/chroma_db
-    restart: always
+      - labassist_data:/app/runtime
+      - labassist_chroma:/app/chroma_db
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: labassist
+      POSTGRES_PASSWORD: labassist
+      POSTGRES_DB: labassist
+    ports: ["5432:5432"]
+    volumes: ["labassist_postgres:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U labassist -d labassist"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  operations-api:
+    build: ./apps/api
+    environment:
+      DATABASE_URL: postgresql://labassist:labassist@postgres:5432/labassist
+      API_PORT: 4000
+      JWT_SECRET: ${JWT_SECRET:-local-labassist-demo-secret}
+    ports: ["4000:4000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  operations-web:
+    build: ./apps/web
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+    ports: ["3000:3000"]
+    depends_on: [operations-api]
+
+  reminder-worker:
+    image: python:3.12-alpine
+    working_dir: /workspace
+    volumes: ["./worker:/workspace/worker:ro"]
+    environment:
+      API_URL: http://operations-api:4000/api
+      DEMO_EMAIL: demo@northstar.test
+      DEMO_PASSWORD: demo-password
+    command: ["python", "worker/reminders.py"]
+    depends_on: [operations-api]
+
+volumes:
+  labassist_data:
+  labassist_chroma:
+  labassist_postgres:

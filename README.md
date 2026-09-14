@@ -157,4 +157,31 @@ Set `ALLOWED_ORIGINS` to the explicit domains allowed to host the web widget. Do
 ---
 
 ## 📄 License
+
 MIT License — Developed by [Vineet Pandey](https://github.com/pandeymic).
+
+## Unified healthcare operations platform
+
+This repository now includes the internal operations application alongside the
+patient-facing LabAssist experience. The operations portal is built with
+Next.js, React, TypeScript, NestJS/Express concepts, PostgreSQL, and a Python
+reminder worker. See [the integration guide](docs/platform-integration.md).
+
+Run the two local surfaces separately during development:
+
+```bash
+# Patient-facing LabAssist assistant
+uvicorn backend.main:app --reload --port 8000
+
+# Staff healthcare operations portal
+npm install
+npm run dev:operations
+```
+
+Open `http://localhost:8000` for the patient experience and
+`http://localhost:3000` for the staff operations portal. For the complete
+containerized stack, run `docker compose up --build`.
+
+All records remain synthetic. The assistant provides approved catalog facts and
+collects booking requests; the operations API owns authorization, availability
+validation, database writes, and audit history.

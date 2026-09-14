@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Provider Ops synthetic dashboard preview</title>
+  <desc id="desc">A stylized preview of the Provider Ops operations dashboard with appointment and claims cards.</desc>
+  <rect width="1200" height="720" fill="#f6f8fa"/>
+  <rect width="230" height="720" fill="#ffffff" stroke="#e7eaee"/>
+  <text x="30" y="50" font-family="Arial" font-size="20" font-weight="700" fill="#18212f">✦ northstar</text>
+  <text x="30" y="75" font-family="Arial" font-size="20" font-weight="700" fill="#18212f">provider ops</text>
+  <rect x="20" y="120" width="190" height="40" rx="7" fill="#edf1ff"/>
+  <text x="35" y="146" font-family="Arial" font-size="13" fill="#4769e8">⌁  Overview</text>
+  <text x="35" y="195" font-family="Arial" font-size="13" fill="#8290a1">▦  Appointments</text>
+  <text x="35" y="240" font-family="Arial" font-size="13" fill="#8290a1">◈  Claims</text>
+  <text x="35" y="285" font-family="Arial" font-size="13" fill="#8290a1">♧  Providers</text>
+  <text x="35" y="330" font-family="Arial" font-size="13" fill="#8290a1">◎  Patients</text>
+  <text x="275" y="58" font-family="Arial" font-size="11" font-weight="700" letter-spacing="2" fill="#7a8493">MONDAY, SEPTEMBER 14, 2026</text>
+  <text x="275" y="95" font-family="Arial" font-size="28" font-weight="700" fill="#18212f">Good morning, Operations</text>
+  <text x="275" y="120" font-family="Arial" font-size="14" fill="#7a8493">A clear view of today’s care operations.</text>
+  <rect x="275" y="150" width="875" height="60" rx="9" fill="#eaf7f4" stroke="#d3f0e9"/>
+  <text x="300" y="177" font-family="Arial" font-size="14" font-weight="700" fill="#18212f">✦  Everything looks calm</text>
+  <text x="300" y="197" font-family="Arial" font-size="12" fill="#68877f">4 appointments are on the board today. One claim needs attention.</text>
+  <g font-family="Arial">
+    <rect x="275" y="230" width="205" height="105" rx="9" fill="#ffffff" stroke="#e7eaee"/><text x="295" y="258" font-size="12" fill="#7a8493">Today’s appointments</text><text x="295" y="295" font-size="27" font-weight="700" fill="#18212f">4</text><text x="295" y="317" font-size="11" fill="#31b89c">+2 from yesterday</text>
+    <rect x="500" y="230" width="205" height="105" rx="9" fill="#ffffff" stroke="#e7eaee"/><text x="520" y="258" font-size="12" fill="#7a8493">Checked in</text><text x="520" y="295" font-size="27" font-weight="700" fill="#18212f">1</text><text x="520" y="317" font-size="11" fill="#31b89c">On schedule</text>
+    <rect x="725" y="230" width="205" height="105" rx="9" fill="#ffffff" stroke="#e7eaee"/><text x="745" y="258" font-size="12" fill="#7a8493">Claims in review</text><text x="745" y="295" font-size="27" font-weight="700" fill="#18212f">1</text><text x="745" y="317" font-size="11" fill="#d79739">Needs attention</text>
+    <rect x="950" y="230" width="200" height="105" rx="9" fill="#ffffff" stroke="#e7eaee"/><text x="970" y="258" font-size="12" fill="#7a8493">Clean claim rate</text><text x="970" y="295" font-size="27" font-weight="700" fill="#18212f">96.4%</text><text x="970" y="317" font-size="11" fill="#31b89c">+1.2% this month</text>
+    <rect x="275" y="360" width="430" height="300" rx="9" fill="#ffffff" stroke="#e7eaee"/><text x="300" y="395" font-size="17" font-weight="700" fill="#18212f">Today’s appointments</text><text x="300" y="417" font-size="12" fill="#7a8493">Monday, September 14</text>
+    <text x="300" y="465" font-size="11" fill="#7a8493">9:00 AM</text><text x="370" y="465" font-size="13" font-weight="700" fill="#18212f">Dr. Maya Chen</text><rect x="590" y="451" width="82" height="24" rx="5" fill="#edf1ff"/><text x="603" y="467" font-size="10" fill="#5873db">Scheduled</text>
+    <text x="300" y="525" font-size="11" fill="#7a8493">10:00 AM</text><text x="370" y="525" font-size="13" font-weight="700" fill="#18212f">Dr. Elias Brooks</text><rect x="590" y="511" width="82" height="24" rx="5" fill="#e7f8f3"/><text x="603" y="527" font-size="10" fill="#299d87">Checked in</text>
+    <text x="300" y="585" font-size="11" fill="#7a8493">11:00 AM</text><text x="370" y="585" font-size="13" font-weight="700" fill="#18212f">Dr. Maya Chen</text><rect x="590" y="571" width="82" height="24" rx="5" fill="#f1f3f5"/><text x="603" y="587" font-size="10" fill="#76808c">Completed</text>
+    <rect x="725" y="360" width="425" height="300" rx="9" fill="#ffffff" stroke="#e7eaee"/><text x="750" y="395" font-size="17" font-weight="700" fill="#18212f">Claims pipeline</text><text x="750" y="417" font-size="12" fill="#7a8493">Latest billing activity</text>
+    <text x="750" y="465" font-size="12" font-weight="700" fill="#18212f">CL-401</text><text x="975" y="465" font-size="12" fill="#18212f">$185.00</text><rect x="1060" y="450" width="70" height="24" rx="5" fill="#fff4e3"/><text x="1068" y="466" font-size="10" fill="#b77a27">In review</text>
+    <text x="750" y="525" font-size="12" font-weight="700" fill="#18212f">CL-402</text><text x="975" y="525" font-size="12" fill="#18212f">$240.00</text><rect x="1060" y="510" width="70" height="24" rx="5" fill="#edf1ff"/><text x="1070" y="526" font-size="10" fill="#5873db">Submitted</text>
+    <text x="750" y="585" font-size="12" font-weight="700" fill="#18212f">CL-403</text><text x="975" y="585" font-size="12" fill="#18212f">$125.00</text><rect x="1060" y="570" width="70" height="24" rx="5" fill="#e7f8f3"/><text x="1078" y="586" font-size="10" fill="#299d87">Paid</text>
+  </g>
+  <text x="275" y="695" font-family="Arial" font-size="11" fill="#9aa3af">Demo environment · synthetic records only</text>
+</svg>
