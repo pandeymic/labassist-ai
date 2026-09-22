@@ -99,6 +99,40 @@ def require_admin_key(x_admin_key: Optional[str] = Header(default=None)) -> None
     if x_admin_key != configured_key:
         raise HTTPException(status_code=401, detail="Invalid administrative API key.")
 
+
+def deterministic_catalog_reply(message: str) -> Optional[str]:
+    """Answer approved catalog questions without requiring an LLM key."""
+    catalog_path = Path(__file__).resolve().parent.parent / "data" / "test_catalog.json"
+    records = json.loads(catalog_path.read_text(encoding="utf-8"))
+    normalized = message.casefold()
+    for record in records:
+        aliases = [record["name"], record["test_id"], *record.get("aliases", [])]
+        if any(alias.casefold() in normalized for alias in aliases):
+            fasting = (
+                f"Fasting is required for {record['fasting_hours']} hours."
+                if record["fasting_required"]
+                else "Fasting is not required."
+            )
+            return (
+                f"{record['name']} costs ₹{record['price_inr']}. {fasting} "
+                f"The expected turnaround is {record['turnaround_time']}. "
+                "These details come from the synthetic laboratory catalog."
+            )
+    return None
+
+
+def deterministic_reply(message: str, intent: str, booking_instructions: str = "") -> str:
+    if intent == "CHECK_PRICE_OR_INFO":
+        return deterministic_catalog_reply(message) or (
+            "I can provide approved synthetic catalog details such as price, fasting, "
+            "sample type, and turnaround time. Please name the test you want to check."
+        )
+    if intent == "FAQ_OR_POLICY":
+        return "I can help with synthetic test catalog and home-collection questions. Please ask about a specific test or contact staff for assistance."
+    if intent == "BOOK_APPOINTMENT" and booking_instructions:
+        return booking_instructions.replace("Ask the patient to", "Please").replace("Ask for", "Please provide")
+    return "I can help with synthetic test information, home collection, and appointment booking."
+
 # --- Routes ---
 @app.get("/")
 def serve_frontend():
@@ -250,9 +284,6 @@ def handle_chat(req: ChatRequest):
     3. Manages multi-turn appointment booking state if BOOK_APPOINTMENT
     4. Generates empathetic, grounded response in requested language
     """
-    if not client:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY missing in server configuration.")
-
     # Never let abusive or unrelated messages become appointment data. Keep the
     # current state intact and give the patient a neutral way back to the task.
     if is_abusive_message(req.message):
@@ -329,7 +360,7 @@ def handle_chat(req: ChatRequest):
     use_rag = False
 
     # 2. Retrieve RAG Context if asking about tests, prices, fasting, or laboratory policies
-    if intent_name in ["CHECK_PRICE_OR_INFO", "FAQ_OR_POLICY"]:
+    if client and intent_name in ["CHECK_PRICE_OR_INFO", "FAQ_OR_POLICY"]:
         retrieved_context = rag_service.search_knowledge_base(req.message, n_results=3)
         use_rag = True
 
@@ -442,18 +473,21 @@ def handle_chat(req: ChatRequest):
         system_prompt += f"\n\n=== BOOKING STATE INSTRUCTIONS ==={booking_instructions}\n"
 
     # 5. Generate LLM Reply
-    try:
-        completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": req.message}
-            ],
-            temperature=0.3
-        )
-        reply_text = completion.choices[0].message.content
-    except Exception as e:
-        reply_text = f"I apologize, our laboratory system is momentarily updating. Please try again or call our helpdesk at +91-8299597072."
+    if not client:
+        reply_text = deterministic_reply(req.message, intent_name, booking_instructions)
+    else:
+        try:
+            completion = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": req.message}
+                ],
+                temperature=0.3
+            )
+            reply_text = completion.choices[0].message.content
+        except Exception:
+            reply_text = deterministic_reply(req.message, intent_name, booking_instructions)
 
     return ChatResponse(
         session_id=req.session_id,
