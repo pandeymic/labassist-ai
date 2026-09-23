@@ -1,0 +1,60 @@
+{"query":"What is the price of a CBC test?","expected_test_id":"LAB001","language":"English"}
+{"query":"Do I need fasting for a complete blood count?","expected_test_id":"LAB001","language":"English"}
+{"query":"How much does a blood count cost?","expected_test_id":"LAB001","language":"English"}
+{"query":"What is included in the hemogram test?","expected_test_id":"LAB001","language":"English"}
+{"query":"How much is the cholesterol test?","expected_test_id":"LAB002","language":"English"}
+{"query":"Is fasting required for a lipid profile?","expected_test_id":"LAB002","language":"English"}
+{"query":"Tell me the price of the thyroid test","expected_test_id":"LAB003","language":"English"}
+{"query":"What does the TSH test measure?","expected_test_id":"LAB003","language":"English"}
+{"query":"How much is the diabetes test?","expected_test_id":"LAB004","language":"English"}
+{"query":"Does the three month sugar test need fasting?","expected_test_id":"LAB004","language":"English"}
+{"query":"What is the cost of fasting glucose?","expected_test_id":"LAB005","language":"English"}
+{"query":"How many hours should I fast for FBS?","expected_test_id":"LAB005","language":"English"}
+{"query":"What is the price of the liver test?","expected_test_id":"LAB006","language":"English"}
+{"query":"Does the LFT include bilirubin?","expected_test_id":"LAB006","language":"English"}
+{"query":"How much does a kidney function test cost?","expected_test_id":"LAB007","language":"English"}
+{"query":"What is the creatinine test for?","expected_test_id":"LAB007","language":"English"}
+{"query":"How much is a Vitamin D test?","expected_test_id":"LAB008","language":"English"}
+{"query":"What is the price of Vitamin B12 testing?","expected_test_id":"LAB009","language":"English"}
+{"query":"How much does a dengue test cost?","expected_test_id":"LAB010","language":"English"}
+{"query":"What is included in the full body checkup package?","expected_test_id":"LAB012","language":"English"}
+{"query":"सीबीसी जांच की कीमत क्या है?","expected_test_id":"LAB001","language":"Hindi"}
+{"query":"क्या पूर्ण रक्त गणना के लिए उपवास जरूरी है?","expected_test_id":"LAB001","language":"Hindi"}
+{"query":"हीमोग्राम जांच में क्या देखा जाता है?","expected_test_id":"LAB001","language":"Hindi"}
+{"query":"कोलेस्ट्रॉल जांच की कीमत कितनी है?","expected_test_id":"LAB002","language":"Hindi"}
+{"query":"लिपिड प्रोफाइल के लिए कितने घंटे का उपवास चाहिए?","expected_test_id":"LAB002","language":"Hindi"}
+{"query":"थायरॉइड जांच का दाम क्या है?","expected_test_id":"LAB003","language":"Hindi"}
+{"query":"टीएसएच जांच किसलिए होती है?","expected_test_id":"LAB003","language":"Hindi"}
+{"query":"मधुमेह जांच की कीमत क्या है?","expected_test_id":"LAB004","language":"Hindi"}
+{"query":"तीन महीने की शुगर जांच के लिए उपवास चाहिए?","expected_test_id":"LAB004","language":"Hindi"}
+{"query":"फास्टिंग ब्लड शुगर की कीमत कितनी है?","expected_test_id":"LAB005","language":"Hindi"}
+{"query":"खाली पेट शुगर जांच के लिए कितने घंटे भूखा रहना है?","expected_test_id":"LAB005","language":"Hindi"}
+{"query":"लिवर की जांच का खर्च कितना है?","expected_test_id":"LAB006","language":"Hindi"}
+{"query":"बिलीरुबिन जांच किस टेस्ट में होती है?","expected_test_id":"LAB006","language":"Hindi"}
+{"query":"गुर्दे की जांच की कीमत क्या है?","expected_test_id":"LAB007","language":"Hindi"}
+{"query":"क्रिएटिनिन जांच किसलिए की जाती है?","expected_test_id":"LAB007","language":"Hindi"}
+{"query":"विटामिन डी जांच कितने की है?","expected_test_id":"LAB008","language":"Hindi"}
+{"query":"विटामिन बी12 जांच की कीमत बताइए","expected_test_id":"LAB009","language":"Hindi"}
+{"query":"डेंगू जांच का दाम क्या है?","expected_test_id":"LAB010","language":"Hindi"}
+{"query":"पेशाब की जांच कितने की है?","expected_test_id":"LAB011","language":"Hindi"}
+{"query":"पूरे शरीर की जांच पैकेज की कीमत क्या है?","expected_test_id":"LAB012","language":"Hindi"}
+{"query":"khoon ki jaanch ka price kya hai?","expected_test_id":"LAB001","language":"Hinglish"}
+{"query":"cbc test ke liye fasting chahiye kya?","expected_test_id":"LAB001","language":"Hinglish"}
+{"query":"hemogram mein kya check hota hai?","expected_test_id":"LAB001","language":"Hinglish"}
+{"query":"cholesterol test kitne ka hai?","expected_test_id":"LAB002","language":"Hinglish"}
+{"query":"lipid profile ke liye kitne ghante fasting hai?","expected_test_id":"LAB002","language":"Hinglish"}
+{"query":"thyroid ki jaanch ka price batao","expected_test_id":"LAB003","language":"Hinglish"}
+{"query":"TSH test kis liye hota hai?","expected_test_id":"LAB003","language":"Hinglish"}
+{"query":"diabetes ki jaanch kitne ki hai?","expected_test_id":"LAB004","language":"Hinglish"}
+{"query":"teen mahine ki sugar test mein fasting hoti hai?","expected_test_id":"LAB004","language":"Hinglish"}
+{"query":"fasting sugar test ka rate kya hai?","expected_test_id":"LAB005","language":"Hinglish"}
+{"query":"khaali pet sugar ke liye kitna fasting karna hai?","expected_test_id":"LAB005","language":"Hinglish"}
+{"query":"jigar ki jaanch kitne ki hai?","expected_test_id":"LAB006","language":"Hinglish"}
+{"query":"bilirubin test kis test mein hota hai?","expected_test_id":"LAB006","language":"Hinglish"}
+{"query":"gurde ki jaanch ka price kya hai?","expected_test_id":"LAB007","language":"Hinglish"}
+{"query":"creatinine test kisliye hota hai?","expected_test_id":"LAB007","language":"Hinglish"}
+{"query":"vitamin d ki jaanch ka daam batao","expected_test_id":"LAB008","language":"Hinglish"}
+{"query":"b12 test kitne ka hai?","expected_test_id":"LAB009","language":"Hinglish"}
+{"query":"dengue ki jaanch ka price kya hai?","expected_test_id":"LAB010","language":"Hinglish"}
+{"query":"peshab ki jaanch kitne ki hai?","expected_test_id":"LAB011","language":"Hinglish"}
+{"query":"poore badan ka checkup package kitne ka hai?","expected_test_id":"LAB012","language":"Hinglish"}
