@@ -63,7 +63,7 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     session_id: str = Field(default="default-session", description="Unique conversation ID")
     message: str = Field(..., description="User message text")
-    language: Optional[str] = Field(default="English", description="Target response language (English, Hindi, Bengali)")
+    language: Optional[str] = Field(default=None, description="Optional language hint; otherwise detected from the message")
     source: str = Field(default="chat", description="Interaction channel: chat, voice, or whatsapp")
 
 class ChatResponse(BaseModel):
@@ -101,7 +101,16 @@ def require_admin_key(x_admin_key: Optional[str] = Header(default=None)) -> None
         raise HTTPException(status_code=401, detail="Invalid administrative API key.")
 
 
-def deterministic_catalog_reply(message: str) -> Optional[str]:
+def detect_language(message: str) -> str:
+    """Detect Hindi, Bengali, or English from the user's Unicode script."""
+    if re.search(r"[\u0900-\u097F]", message):
+        return "Hindi"
+    if re.search(r"[\u0980-\u09FF]", message):
+        return "Bengali"
+    return "English"
+
+
+def deterministic_catalog_reply(message: str, language: str = "English") -> Optional[str]:
     """Answer catalog questions with exact and typo-tolerant alias matching."""
     catalog_path = Path(__file__).resolve().parent.parent / "data" / "test_catalog.json"
     records = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -123,7 +132,7 @@ def deterministic_catalog_reply(message: str) -> Optional[str]:
         for alias in aliases:
             normalized_alias = normalize(alias)
             if normalized_alias and normalized_alias in normalized:
-                return _format_catalog_reply(record)
+                return _format_catalog_reply(record, language)
             candidates.append((normalized_alias, record))
 
     # Compare the complete message against each alias using partial_ratio so
@@ -132,35 +141,71 @@ def deterministic_catalog_reply(message: str) -> Optional[str]:
     fuzzy_match = process.extractOne(normalized, choices, scorer=fuzz.partial_ratio, score_cutoff=86)
     if fuzzy_match:
         _, _, match_index = fuzzy_match
-        return _format_catalog_reply(candidates[match_index][1])
+        return _format_catalog_reply(candidates[match_index][1], language)
 
     return None
 
 
-def _format_catalog_reply(record: Dict[str, Any]) -> str:
+def _format_catalog_reply(record: Dict[str, Any], language: str = "English") -> str:
     """Format a deterministic response from one synthetic catalog record."""
     fasting = (
         f"Fasting is required for {record['fasting_hours']} hours."
         if record["fasting_required"]
         else "Fasting is not required."
     )
-    return (
+    english_reply = (
         f"{record['name']} costs ₹{record['price_inr']}. {fasting} "
         f"The expected turnaround is {record['turnaround_time']}. "
         "These details come from the synthetic laboratory catalog."
     )
+    if language == "Hindi":
+        fasting_hi = (
+            f"{record['fasting_hours']} घंटे का उपवास आवश्यक है।"
+            if record["fasting_required"]
+            else "उपवास आवश्यक नहीं है।"
+        )
+        return (
+            f"{record['name']} की कीमत ₹{record['price_inr']} है। {fasting_hi} "
+            f"रिपोर्ट का अनुमानित समय {record['turnaround_time']} है। "
+            "ये जानकारी सिंथेटिक लैब कैटलॉग से ली गई है।"
+        )
+    if language == "Bengali":
+        fasting_bn = (
+            f"{record['fasting_hours']} ঘণ্টা উপবাস প্রয়োজন।"
+            if record["fasting_required"]
+            else "উপবাসের প্রয়োজন নেই।"
+        )
+        return (
+            f"{record['name']} এর দাম ₹{record['price_inr']}। {fasting_bn} "
+            f"রিপোর্ট পাওয়ার আনুমানিক সময় {record['turnaround_time']}। "
+            "এই তথ্য সিন্থেটিক ল্যাব ক্যাটালগ থেকে নেওয়া হয়েছে।"
+        )
+    return english_reply
 
 
-def deterministic_reply(message: str, intent: str, booking_instructions: str = "") -> str:
+def deterministic_reply(
+    message: str,
+    intent: str,
+    booking_instructions: str = "",
+    language: str = "English",
+) -> str:
     if intent == "CHECK_PRICE_OR_INFO":
-        return deterministic_catalog_reply(message) or (
+        return deterministic_catalog_reply(message, language) or (
             "I can provide approved synthetic catalog details such as price, fasting, "
             "sample type, and turnaround time. Please name the test you want to check."
         )
     if intent == "FAQ_OR_POLICY":
+        if language == "Hindi":
+            return "मैं सिंथेटिक टेस्ट कैटलॉग और होम-कलेक्शन से जुड़े सवालों में मदद कर सकता हूँ। कृपया किसी खास जांच के बारे में पूछें।"
+        if language == "Bengali":
+            return "আমি সিন্থেটিক টেস্ট ক্যাটালগ এবং বাড়ি থেকে নমুনা সংগ্রহের প্রশ্নে সাহায্য করতে পারি। নির্দিষ্ট কোনো পরীক্ষা সম্পর্কে জিজ্ঞাসা করুন।"
         return "I can help with synthetic test catalog and home-collection questions. Please ask about a specific test or contact staff for assistance."
     if intent == "BOOK_APPOINTMENT" and booking_instructions:
         return booking_instructions.replace("Ask the patient to", "Please").replace("Ask for", "Please provide")
+    if language == "Hindi":
+        return "मैं सिंथेटिक टेस्ट की जानकारी, घर से सैंपल संग्रह और अपॉइंटमेंट बुकिंग में मदद कर सकता हूँ।"
+    if language == "Bengali":
+        return "আমি সিন্থেটিক টেস্টের তথ্য, বাড়ি থেকে নমুনা সংগ্রহ এবং অ্যাপয়েন্টমেন্ট বুকিংয়ে সাহায্য করতে পারি।"
     return "I can help with synthetic test information, home collection, and appointment booking."
 
 # --- Routes ---
@@ -314,12 +359,27 @@ def handle_chat(req: ChatRequest):
     3. Manages multi-turn appointment booking state if BOOK_APPOINTMENT
     4. Generates empathetic, grounded response in requested language
     """
+    existing_session = get_or_create_booking_session(req.session_id)
+    detected_language = detect_language(req.message)
+    # Preserve the session language for numeric/date-only booking turns. A
+    # Devanagari or Bengali message always updates the stored language.
+    if detected_language != "English" or not existing_session.detected_language:
+        existing_session.detected_language = detected_language
+        save_booking_session(existing_session)
+    response_language = existing_session.detected_language or "English"
+
     # Never let abusive or unrelated messages become appointment data. Keep the
     # current state intact and give the patient a neutral way back to the task.
     if is_abusive_message(req.message):
         return ChatResponse(
             session_id=req.session_id,
-            reply="I’m here to help with test information, home collection, or appointment booking. Please share what you need help with.",
+            reply=(
+                "मैं टेस्ट की जानकारी, घर से सैंपल संग्रह या अपॉइंटमेंट बुकिंग में मदद कर सकता हूँ। कृपया बताएं कि आपको किस सहायता की जरूरत है।"
+                if response_language == "Hindi"
+                else "আমি টেস্টের তথ্য, বাড়ি থেকে নমুনা সংগ্রহ বা অ্যাপয়েন্টমেন্ট বুকিংয়ে সাহায্য করতে পারি। কী সাহায্য প্রয়োজন তা বলুন।"
+                if response_language == "Bengali"
+                else "I’m here to help with test information, home collection, or appointment booking. Please share what you need help with."
+            ),
             intent="GENERAL_CHAT",
             confidence="high",
             retrieved_context_used=False,
@@ -363,7 +423,6 @@ def handle_chat(req: ChatRequest):
                 )
 
     # 1. Classify Intent (or override if session is actively collecting booking fields)
-    existing_session = get_or_create_booking_session(req.session_id)
     has_booking_progress = any(
         [
             existing_session.patient_name,
@@ -385,10 +444,24 @@ def handle_chat(req: ChatRequest):
         intent_name = intent_data.get("intent", "GENERAL_CHAT")
         confidence = str(intent_data.get("confidence", "high"))
 
+        # The local fallback classifier is intentionally small. A known test
+        # alias plus a non-booking message is enough to identify a catalog
+        # question even when the message is written entirely in Hindi/Bengali.
+        catalog_reply = deterministic_catalog_reply(req.message, response_language)
+        booking_words = (
+            "book", "schedule", "appointment", "बुक", "अपॉइंटमेंट", "बुकिंग",
+            "অ্যাপয়েন্টমেন্ট", "বুকিং", "বুক",
+        )
+        if intent_name == "GENERAL_CHAT" and catalog_reply and not any(
+            word in req.message.casefold() for word in booking_words
+        ):
+            intent_name = "CHECK_PRICE_OR_INFO"
+            confidence = "high (catalog alias match)"
+
     # Resolve known catalog aliases before initializing or querying the vector
     # index. This keeps common Hindi/Hinglish requests deterministic and fast.
     if intent_name == "CHECK_PRICE_OR_INFO":
-        catalog_reply = deterministic_catalog_reply(req.message)
+        catalog_reply = catalog_reply or deterministic_catalog_reply(req.message, response_language)
         if catalog_reply:
             return ChatResponse(
                 session_id=req.session_id,
@@ -412,6 +485,7 @@ def handle_chat(req: ChatRequest):
     confirmed_card = None
     if intent_name == "BOOK_APPOINTMENT":
         booking_state = existing_session
+        booking_state.detected_language = response_language
         lower_msg = req.message.lower()
         for test_keyword in ["cbc", "lipid", "thyroid", "hba1c", "fbs", "lft", "kft", "vitamin d", "vitamin b12", "dengue", "urine", "checkup"]:
             if test_keyword in lower_msg:
@@ -501,7 +575,7 @@ def handle_chat(req: ChatRequest):
         f"You are LabAssist, a warm, professional, and empathetic AI front desk assistant for a diagnostic medical laboratory.\n"
         f"Your goal is to assist patients with accurate test information, pricing, preparation instructions, and appointment bookings.\n"
         f"IMPORTANT RULES:\n"
-        f"- Always answer in {req.language}.\n"
+        f"- Always answer in {response_language}.\n"
         f"- NEVER invent test prices or fasting hours that are not in the retrieved context.\n"
         f"- If the user asks a medical diagnostic question, remind them to consult a qualified physician after receiving reports.\n"
         f"- Never interpret results, diagnose, prescribe, or give treatment advice. Escalate those requests to staff.\n"
@@ -517,7 +591,7 @@ def handle_chat(req: ChatRequest):
 
     # 5. Generate LLM Reply
     if not client:
-        reply_text = deterministic_reply(req.message, intent_name, booking_instructions)
+        reply_text = deterministic_reply(req.message, intent_name, booking_instructions, response_language)
     else:
         try:
             completion = client.chat.completions.create(
@@ -530,7 +604,7 @@ def handle_chat(req: ChatRequest):
             )
             reply_text = completion.choices[0].message.content
         except Exception:
-            reply_text = deterministic_reply(req.message, intent_name, booking_instructions)
+            reply_text = deterministic_reply(req.message, intent_name, booking_instructions, response_language)
 
     return ChatResponse(
         session_id=req.session_id,
@@ -558,7 +632,6 @@ async def whatsapp_webhook(request: Request):
     chat_req = ChatRequest(
         session_id=sender,
         message=body,
-        language="English",
         source="whatsapp",
     )
     chat_res = handle_chat(chat_req)
@@ -609,7 +682,7 @@ async def voice_respond(request: Request):
         )
 
     chat_res = handle_chat(
-        ChatRequest(session_id=f"voice:{call_sid}", message=speech, language="English", source="voice")
+        ChatRequest(session_id=f"voice:{call_sid}", message=speech, source="voice")
     )
     reply = chat_res.reply
     if chat_res.booking_card:

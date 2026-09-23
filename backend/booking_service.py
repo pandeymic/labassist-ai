@@ -13,6 +13,7 @@ from backend.store import get_store
 @dataclass
 class BookingState:
     session_id: str
+    detected_language: Optional[str] = None
     status: str = "collecting_fields"
     patient_name: Optional[str] = None
     phone_number: Optional[str] = None
@@ -118,7 +119,32 @@ def confirm_booking(state: BookingState) -> tuple[Optional[dict[str, Any]], Opti
 
 
 def format_booking_prompt(state: BookingState) -> str:
+    language = state.detected_language or "English"
     if state.status == "awaiting_confirmation":
+        if language == "Hindi":
+            return (
+                "कृपया इन विवरणों की पुष्टि होने पर केवल YES लिखें:\n"
+                f"- मरीज का नाम: {state.patient_name}\n"
+                f"- फोन: {state.phone_number}\n"
+                f"- जांच: {state.test_name}\n"
+                f"- सैंपल संग्रह: {state.collection_type}\n"
+                f"- तारीख और समय: {state.preferred_date} को {state.preferred_time}\n"
+                f"- पता: {state.collection_address or 'लैब विजिट'}\n"
+                f"- पिनकोड: {state.pincode or 'उपलब्ध नहीं'}\n"
+                "अभी बुकिंग की पुष्टि नहीं हुई है।"
+            )
+        if language == "Bengali":
+            return (
+                "এই তথ্যগুলি সঠিক হলে শুধুমাত্র YES লিখে নিশ্চিত করুন:\n"
+                f"- রোগীর নাম: {state.patient_name}\n"
+                f"- ফোন: {state.phone_number}\n"
+                f"- পরীক্ষা: {state.test_name}\n"
+                f"- নমুনা সংগ্রহ: {state.collection_type}\n"
+                f"- তারিখ ও সময়: {state.preferred_date}, {state.preferred_time}\n"
+                f"- ঠিকানা: {state.collection_address or 'ল্যাব ভিজিট'}\n"
+                f"- পিনকোড: {state.pincode or 'নেই'}\n"
+                "এখনও বুকিং নিশ্চিত হয়নি।"
+            )
         return (
             "Ask the patient to reply with YES only if these details are correct:\n"
             f"- Patient Name: {state.patient_name}\n"
@@ -140,4 +166,25 @@ def format_booking_prompt(state: BookingState) -> str:
         "collection_address": "Ask for the complete home-collection address.",
         "pincode": "Ask for the home-collection pincode.",
     }
-    return prompts.get(state.get_missing_field(), "How can I assist with the appointment?")
+    english_prompt = prompts.get(state.get_missing_field(), "How can I assist with the appointment?")
+    if language == "Hindi":
+        return {
+            "test_name": "कृपया बताएं कि आप कौन-सी लैब जांच या हेल्थ पैकेज बुक करना चाहते हैं।",
+            "patient_name": "कृपया मरीज का पूरा नाम बताएं।",
+            "phone_number": "कृपया बुकिंग अपडेट के लिए 10 अंकों का मोबाइल नंबर बताएं।",
+            "preferred_date": "कृपया पसंदीदा सैंपल संग्रह तारीख YYYY-MM-DD प्रारूप में बताएं।",
+            "preferred_time": "कृपया उपलब्ध स्लॉट में से समय चुनें, जैसे 08:00।",
+            "collection_address": "कृपया घर से सैंपल संग्रह का पूरा पता बताएं।",
+            "pincode": "कृपया घर से सैंपल संग्रह का पिनकोड बताएं।",
+        }.get(state.get_missing_field(), "मैं आपकी कैसे सहायता कर सकता हूँ?")
+    if language == "Bengali":
+        return {
+            "test_name": "আপনি কোন ল্যাব পরীক্ষা বা স্বাস্থ্য প্যাকেজ বুক করতে চান তা বলুন।",
+            "patient_name": "রোগীর পুরো নাম বলুন।",
+            "phone_number": "বুকিং আপডেটের জন্য ১০ সংখ্যার মোবাইল নম্বর বলুন।",
+            "preferred_date": "পছন্দের নমুনা সংগ্রহের তারিখ YYYY-MM-DD ফরম্যাটে বলুন।",
+            "preferred_time": "উপলব্ধ স্লট থেকে একটি সময় বেছে নিন, যেমন 08:00।",
+            "collection_address": "বাড়ি থেকে নমুনা সংগ্রহের সম্পূর্ণ ঠিকানা বলুন।",
+            "pincode": "বাড়ি থেকে নমুনা সংগ্রহের পিনকোড বলুন।",
+        }.get(state.get_missing_field(), "আমি কীভাবে সাহায্য করতে পারি?")
+    return english_prompt
