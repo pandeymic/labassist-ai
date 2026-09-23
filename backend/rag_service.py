@@ -1,7 +1,9 @@
 import os
 import json
+import re
 import chromadb
 from typing import List, Dict, Any
+from sentence_transformers import SentenceTransformer
 
 class LabRAGService:
     def __init__(self, db_path: str = "./chroma_db"):
@@ -9,17 +11,50 @@ class LabRAGService:
         Initializes the persistent ChromaDB client and indexes our diagnostic lab catalog & FAQs.
         """
         self.db_path = db_path
+        self.model_name = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-small")
+        self.model = SentenceTransformer(self.model_name)
         self.client = chromadb.PersistentClient(path=self.db_path)
-        self.collection = self.client.get_or_create_collection(
-            name="lab_knowledge_base",
-            metadata={"hnsw:space": "cosine"}
-        )
+        self.collection_name = self._collection_name(self.model_name)
+        self.collection = self._get_model_collection()
         self._load_and_index_data()
+
+    @staticmethod
+    def _collection_name(model_name: str) -> str:
+        model_slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", model_name).strip("_")
+        return f"kb_{model_slug}"
+
+    def _get_model_collection(self):
+        """Get a model-specific collection, rebuilding it after model changes."""
+        try:
+            collection = self.client.get_collection(name=self.collection_name)
+        except Exception:
+            collection = None
+
+        stored_model = collection.metadata.get("embedding_model") if collection else None
+        if collection and stored_model != self.model_name:
+            self.client.delete_collection(name=self.collection_name)
+            collection = None
+
+        if collection is None:
+            collection = self.client.get_or_create_collection(
+                name=self.collection_name,
+                metadata={
+                    "hnsw:space": "cosine",
+                    "embedding_model": self.model_name,
+                },
+            )
+        return collection
+
+    def _encode(self, texts: List[str], prefix: str) -> List[List[float]]:
+        inputs = [f"{prefix}{text}" for text in texts]
+        embeddings = self.model.encode(inputs, normalize_embeddings=True)
+        return embeddings.tolist() if hasattr(embeddings, "tolist") else embeddings
 
     def _load_and_index_data(self):
         """
         Loads test_catalog.json and faqs.json from the data/ directory and embeds them into ChromaDB.
-        Only indexes if collection is currently empty to avoid duplicate insertions.
+        Only indexes if collection is currently empty; model changes are handled
+        during collection initialization before this method runs.
         """
         if self.collection.count() > 0:
             # Already indexed
@@ -74,6 +109,7 @@ class LabRAGService:
         if documents:
             self.collection.add(
                 documents=documents,
+                embeddings=self._encode(documents, "passage: "),
                 metadatas=metadatas,
                 ids=ids
             )
@@ -84,9 +120,13 @@ class LabRAGService:
         Performs vector similarity search on the user's query and returns formatted context string
         to be injected into the LLM system prompt.
         """
+        count = self.collection.count()
+        if count == 0:
+            return "No specific laboratory tests or policies found in knowledge base."
+
         results = self.collection.query(
-            query_texts=[query_text],
-            n_results=min(n_results, self.collection.count())
+            query_embeddings=self._encode([query_text], "query: "),
+            n_results=min(n_results, count)
         )
 
         if not results or not results.get("documents") or not results["documents"][0]:
