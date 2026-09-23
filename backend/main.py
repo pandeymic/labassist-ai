@@ -24,6 +24,7 @@ from backend.booking_service import (
     save_booking_session,
 )
 from backend.store import get_store
+from backend.channels.whatsapp_meta import router as meta_whatsapp_router
 
 # 1. Load Environment Variables. Project `.env` is preferred for local runs;
 # the home-level file remains a backwards-compatible fallback.
@@ -43,6 +44,7 @@ app = FastAPI(
     description="Production-grade AI Front Desk for Diagnostic Laboratories with RAG, Intent Routing, and Booking State Machine.",
     version="1.1.0"
 )
+app.include_router(meta_whatsapp_router)
 
 # Comma-separated production widget origins. Never combine wildcard origins with
 # credentialed requests when handling patient data.

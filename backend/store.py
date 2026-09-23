@@ -173,6 +173,25 @@ class LabStore:
             ).fetchall()
         return [dict(row) for row in rows]
 
+    def list_available_dates(self, limit: int = 10) -> list[str]:
+        """Return dates with at least one remaining active collection slot."""
+        with self.connection() as connection:
+            rows = connection.execute(
+                """
+                SELECT s.appointment_date
+                FROM appointment_slots s
+                LEFT JOIN appointments a
+                    ON a.preferred_date = s.appointment_date
+                   AND a.preferred_time = s.start_time
+                   AND a.status IN ('confirmed', 'pending_staff_review')
+                WHERE s.is_active = 1
+                GROUP BY s.id
+                HAVING s.capacity - COUNT(a.id) > 0
+                ORDER BY s.appointment_date, s.start_time
+                """,
+            ).fetchall()
+        return list(dict.fromkeys(row["appointment_date"] for row in rows))[:limit]
+
     def save_session(self, session_id: str, state: dict[str, Any]) -> None:
         with self.connection() as connection:
             connection.execute(
