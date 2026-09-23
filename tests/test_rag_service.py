@@ -69,6 +69,8 @@ class RagEmbeddingTests(unittest.TestCase):
 
         self.assertTrue(service.model.inputs[0].startswith("passage: "))
         self.assertTrue(service.model.inputs[-1].startswith("query: "))
+        self.assertTrue(any("khoon ki jaanch" in document for document in client.collection.documents))
+        self.assertTrue(any("पूर्ण रक्त गणना" in document for document in client.collection.documents))
         self.assertTrue(client.collection.added_embeddings)
         self.assertTrue(client.collection.query_embeddings)
         self.assertTrue(service.model.normalize_embeddings)

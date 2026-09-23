@@ -6,6 +6,8 @@ from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 
 class LabRAGService:
+    KNOWLEDGE_BASE_VERSION = "catalog-aliases-v1"
+
     def __init__(self, db_path: str = "./chroma_db"):
         """
         Initializes the persistent ChromaDB client and indexes our diagnostic lab catalog & FAQs.
@@ -31,7 +33,11 @@ class LabRAGService:
             collection = None
 
         stored_model = collection.metadata.get("embedding_model") if collection else None
-        if collection and stored_model != self.model_name:
+        stored_version = collection.metadata.get("knowledge_base_version") if collection else None
+        if collection and (
+            stored_model != self.model_name
+            or stored_version != self.KNOWLEDGE_BASE_VERSION
+        ):
             self.client.delete_collection(name=self.collection_name)
             collection = None
 
@@ -41,6 +47,7 @@ class LabRAGService:
                 metadata={
                     "hnsw:space": "cosine",
                     "embedding_model": self.model_name,
+                    "knowledge_base_version": self.KNOWLEDGE_BASE_VERSION,
                 },
             )
         return collection
@@ -73,8 +80,14 @@ class LabRAGService:
             with open(catalog_path, "r", encoding="utf-8") as f:
                 tests = json.load(f)
                 for t in tests:
+                    aliases = [
+                        *t.get("aliases", []),
+                        *t.get("aliases_hi", []),
+                        *t.get("aliases_hinglish", []),
+                    ]
                     doc_text = (
-                        f"Test Name: {t['name']} ({', '.join(t.get('aliases', []))})\n"
+                        f"Test Name: {t['name']}\n"
+                        f"Aliases: {', '.join(aliases)}\n"
                         f"Category: {t['category']} | Price: ₹{t['price_inr']} INR\n"
                         f"Fasting Required: {'Yes (' + str(t['fasting_hours']) + ' hours)' if t['fasting_required'] else 'No'}\n"
                         f"Sample Type: {t['sample_type']} | Turnaround Time: {t['turnaround_time']}\n"

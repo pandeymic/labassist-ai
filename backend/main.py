@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
 from groq import Groq
+from rapidfuzz import fuzz, process
 
 # Import internal services
 from backend.rag_service import get_rag_service
@@ -101,24 +102,53 @@ def require_admin_key(x_admin_key: Optional[str] = Header(default=None)) -> None
 
 
 def deterministic_catalog_reply(message: str) -> Optional[str]:
-    """Answer approved catalog questions without requiring an LLM key."""
+    """Answer catalog questions with exact and typo-tolerant alias matching."""
     catalog_path = Path(__file__).resolve().parent.parent / "data" / "test_catalog.json"
     records = json.loads(catalog_path.read_text(encoding="utf-8"))
-    normalized = message.casefold()
+
+    def normalize(value: str) -> str:
+        return " ".join(re.sub(r"[^\w\s]", " ", value.casefold(), flags=re.UNICODE).split())
+
+    normalized = normalize(message)
+    candidates = []
+
     for record in records:
-        aliases = [record["name"], record["test_id"], *record.get("aliases", [])]
-        if any(alias.casefold() in normalized for alias in aliases):
-            fasting = (
-                f"Fasting is required for {record['fasting_hours']} hours."
-                if record["fasting_required"]
-                else "Fasting is not required."
-            )
-            return (
-                f"{record['name']} costs ₹{record['price_inr']}. {fasting} "
-                f"The expected turnaround is {record['turnaround_time']}. "
-                "These details come from the synthetic laboratory catalog."
-            )
+        aliases = [
+            record["name"],
+            record["test_id"],
+            *record.get("aliases", []),
+            *record.get("aliases_hi", []),
+            *record.get("aliases_hinglish", []),
+        ]
+        for alias in aliases:
+            normalized_alias = normalize(alias)
+            if normalized_alias and normalized_alias in normalized:
+                return _format_catalog_reply(record)
+            candidates.append((normalized_alias, record))
+
+    # Compare the complete message against each alias using partial_ratio so
+    # natural questions still match, while tolerating small typing errors.
+    choices = [alias for alias, _ in candidates if alias]
+    fuzzy_match = process.extractOne(normalized, choices, scorer=fuzz.partial_ratio, score_cutoff=86)
+    if fuzzy_match:
+        _, _, match_index = fuzzy_match
+        return _format_catalog_reply(candidates[match_index][1])
+
     return None
+
+
+def _format_catalog_reply(record: Dict[str, Any]) -> str:
+    """Format a deterministic response from one synthetic catalog record."""
+    fasting = (
+        f"Fasting is required for {record['fasting_hours']} hours."
+        if record["fasting_required"]
+        else "Fasting is not required."
+    )
+    return (
+        f"{record['name']} costs ₹{record['price_inr']}. {fasting} "
+        f"The expected turnaround is {record['turnaround_time']}. "
+        "These details come from the synthetic laboratory catalog."
+    )
 
 
 def deterministic_reply(message: str, intent: str, booking_instructions: str = "") -> str:
@@ -354,6 +384,19 @@ def handle_chat(req: ChatRequest):
         intent_data = classify_intent(req.message, client)
         intent_name = intent_data.get("intent", "GENERAL_CHAT")
         confidence = str(intent_data.get("confidence", "high"))
+
+    # Resolve known catalog aliases before initializing or querying the vector
+    # index. This keeps common Hindi/Hinglish requests deterministic and fast.
+    if intent_name == "CHECK_PRICE_OR_INFO":
+        catalog_reply = deterministic_catalog_reply(req.message)
+        if catalog_reply:
+            return ChatResponse(
+                session_id=req.session_id,
+                reply=catalog_reply,
+                intent=intent_name,
+                confidence="high (catalog alias match)",
+                retrieved_context_used=False,
+            )
 
     rag_service = get_rag_service()
     retrieved_context = ""
